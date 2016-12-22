@@ -97,7 +97,7 @@ class Weather(object):
 
 		return weather_json
 
-	def say_weather(self):
+	def say_weather(self, weather_json):
 		self.logger.debug('Starting voice assistant')
 		voice_language = self.config.get('voice','language')
 
@@ -126,4 +126,4 @@ if __name__ == '__main__':
 	format_date, format_time, format_period = weather.get_date_time()
 	geolocation_ip_info = weather.get_ip_geolocation()
 	weather_json = weather.get_weather_data(geolocation_ip_info)
-	weather.say_weather()
+	weather.say_weather(weather_json)
