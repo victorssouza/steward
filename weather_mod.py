@@ -6,7 +6,9 @@ import subprocess
 import requests
 import datetime
 import json
-import os, sys
+import os
+import sys
+
 
 class Weather(object):
 		app_configuration_path = 'conf/app_config.ini'
