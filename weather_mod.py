@@ -11,12 +11,21 @@ import sys
 
 
 class Weather(object):
-		app_configuration_path = 'conf/app_config.ini'
-		log_configuration_path = 'conf/logging_config.ini'
-    # Configuring log and application configuration properties from local file
+   
     def __init__(self):
+        # Configuring log and application configuration properties from local file
+        if not os.environ.get('WEATHER_LOG_CONFIG', False):
+            log_configuration_path = 'conf/logging_config.ini'
+        else:
+            log_configuration_path = os.environ.get('WEATHER_LOG_CONFIG', False)
 
-        if not os.path.exists(log_configuration_path) and not os.path.exists(log_alternative_configuration_path):
+        if not os.environ.get('WEATHER_APP_CONFIG', False):
+            app_configuration_path = 'conf/app_config.ini'
+        else:
+            app_configuration_path = os.environ.get('WEATHER_APP_CONFIG', False)
+
+        # Checking if the configuration file exists
+        if not os.path.exists(log_configuration_path):
             print ("Configuration file not found. Expecting: '{}' or custom file from env variable 'WEATHER_LOG_CONFIG'".format(log_configuration_path))
             sys.exit(1)
         else:
@@ -24,7 +33,7 @@ class Weather(object):
             self.logger = logging.getLogger()
             self.logger.debug('Setting log configuration')
 
-        if not os.path.exists(app_configuration_path) and os.path.exists(app_alternative_configuration_path):
+        if not os.path.exists(app_configuration_path):
             self.logger.error("Configuration file not found. Expecting: '{}' or custom file from env variable 'WEATHER_APP_CONFIG'".format(app_configuration_path))
             sys.exit(1)
         else:
@@ -129,3 +138,4 @@ if __name__ == '__main__':
     geolocation_ip_info = weather.get_ip_geolocation()
     weather_json = weather.get_weather_data(geolocation_ip_info)
     weather.say_weather(weather_json)
+
