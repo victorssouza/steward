@@ -23,8 +23,16 @@ A python voice assistant (under development) for several minor tasks
 To hack this app, just:
 - `pip3 install -r requirements.txt`
 - (install mpg123 audio player)
-- `python3 weather_mod.py`  
 
+If you want to run locally, just:
+- `python3 weather_mod.py`
+
+Otherwise, if you want to install it as a pypi package just:
+- `pip3 install .`
+
+In this case, you have to set manually the path for the configuration files:
+- `export WEATHER_LOG_CONFIG='SOME/PATH/FILE.ini'`
+- `export WEATHER_APP_CONFIG='SOME/PATH/FILE.ini'`
 
 ## Additional configuration
 
