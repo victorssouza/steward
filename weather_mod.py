@@ -8,11 +8,17 @@ import datetime
 import json
 import os
 import sys
+from collections import defaultdict
 
+## Configuring default voices and patterns
+#_PHRASES = defaultdict(lambda: 'The weather for today in {} city is: {} degrees celcius, with minimum temperature of {} and max of {}.')
+#_PHRASES.update({'pt-br':'A temperatura atual na cidade de {} é de {} graus celcius, com temperatura mínima de {} e máxima de {}. '})
 
 class Weather(object):
    
     def __init__(self):
+
+        ## SetUp configuration files
         # Configuring log and application configuration properties from local file
         if not os.environ.get('WEATHER_LOG_CONFIG', False):
             log_configuration_path = 'conf/logging_config.ini'
@@ -41,7 +47,7 @@ class Weather(object):
             self.config.read(app_configuration_path)
 
             try:
-                self.logger.debug('Setting application configuration')
+                self.logger.info('Setting application configuration')
                 self.config.get('weather_api', 'api_token')
                 self.config.get('voice', 'language')
             except Exception as e:
@@ -107,18 +113,27 @@ class Weather(object):
 
         return weather_json
 
-    def say_weather(self, weather_json):
-        self.logger.debug('Starting voice assistant')
-        voice_language = self.config.get('voice', 'language')
+    def weather_phrase(self, lang):
+        _PHRASES = defaultdict(lambda: 'The weather for today in {} city is: {} degrees celcius, with minimum temperature of {} and max of {}.')
+        _PHRASES.update({'pt-br':'A temperatura atual na cidade de {} é de {} graus celcius, com temperatura mínima de {} e máxima de {}. '})
 
-        if voice_language == 'pt-br':
-            weather_phrase = 'A temperatura atual na cidade de {} é de {} graus celcius, com temperatura mínima de {} e máxima de {}. \
-                            '.format(weather_json['city'], weather_json['temp'], weather_json['temp_min'], weather_json['temp_max'])
-        else:
-            weather_phrase = 'The weather for today in {} city is: {} degrees celcius, with minimum temperature of {} and max of {}. \
-                            '.format(weather_json['city'], weather_json['temp'], weather_json['temp_min'], weather_json['temp_max'])
+        if not lang in _PHRASES:
+            self.logger.error("Corresponding phrase for '{}' language was not found. Setting the default 'en'".format(lang))
+            lang = 'en'
+            return _PHRASES, lang
+
+        self.logger.debug('Setting voice language to: {}'.format(lang))
+        return _PHRASES, lang
+
+    def say_weather(self, weather_json):
+
+        lang = self.config.get('voice', 'language')
+        _PHRASES, voice_language = self.weather_phrase(self.config.get('voice', 'language'))
+        phrase = _PHRASES[voice_language].format(weather_json['city'],weather_json['temp'],weather_json['temp_min'],weather_json['temp_max'])
+
         try:
-            tts = gTTS(text = weather_phrase, lang=voice_language)
+            self.logger.info('Starting voice assistant')
+            tts = gTTS(text = phrase, lang=voice_language)
             audio_name = 'weather.mp3'
             tts.save(audio_name)
             # brew install mpg123
@@ -130,6 +145,8 @@ class Weather(object):
             if e.args[0] == 'Language not supported: {}'.format(voice_language):
                 self.logger.error('{}'.format(e))
                 sys.exit(1)
+            else:
+                self.logger.error(e.args[0])
             return False
 
 if __name__ == '__main__':

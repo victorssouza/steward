@@ -4,7 +4,7 @@ with open('requirements.txt') as f:
 	requirements = f.read().splitlines()
 
 setup(name='steward',
-      version='0.0.3',
+      version='0.0.4',
       description='Voice Assistant',
       url='http://github.com/victorssouza/steward',
       author='Victor Santos',
