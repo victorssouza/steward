@@ -30,7 +30,7 @@ class Weather(object):
             sys.exit(1)
         else:
             fileConfig(log_configuration_path)
-            self.logger = logging.getLogger()
+            self.logger = logging.getLogger('weather_mod')
             self.logger.debug('Setting log configuration')
 
         if not os.path.exists(app_configuration_path):
